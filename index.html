@@ -252,7 +252,6 @@
     </div>
 
     <script>
-        // База данных приборов
         const devices = {
             fsl: {
                 name: "Анализатор спектра R&S FSL",
@@ -336,17 +335,15 @@
         }
         
         function generateSignal() {
-            // Генерация случайной частоты от 10 Гц до 100 ГГц в логарифмической шкале
+
             const minLog = Math.log10(0.00001); // 10 Гц
             const maxLog = Math.log10(100000);  // 100 ГГц
             const logRange = maxLog - minLog;
             const randomLog = minLog + Math.random() * logRange;
             const frequency = Math.pow(10, randomLog);
             
-            // Генерация случайного уровня сигнала от -120 до 0 дБм
             const power = Math.round(Math.random() * -120);
             
-            // Форматирование частоты для отображения
             let freqDisplay;
             if (frequency < 0.001) {
                 freqDisplay = (frequency * 1000000).toFixed(2) + " Гц";
@@ -388,7 +385,6 @@
             let message = "";
             let isSuitable = true;
             
-            // Проверка частотного диапазона
             if (currentSignal.frequency < device.minFreq) {
                 message += `Частота сигнала ниже минимальной для прибора. `;
                 isSuitable = false;
@@ -397,7 +393,6 @@
                 isSuitable = false;
             }
             
-            // Проверка чувствительности
             if (currentSignal.power < device.minPower) {
                 message += `Мощность сигнала ниже чувствительности прибора.`;
                 isSuitable = false;
@@ -414,3 +409,4 @@
     </script>
 </body>
 </html>            
+
