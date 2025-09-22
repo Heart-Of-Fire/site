@@ -147,7 +147,7 @@
         
         <div class="input-section">
             <input type="text" id="userName" placeholder="Введите ваше имя">
-            <button onclick="welcomeUser()">Приветствовать</button>
+            <button id="welcomeBtn">Приветствовать</button>
             <div id="welcomeMessage" class="welcome"></div>
         </div>
         
@@ -162,16 +162,16 @@
                 <option value="tm">Тесламетр ТМ-196</option>
             </select>
             
-            <button onclick="showCharacteristics()">Показать характеристики</button>
+            <button id="showCharBtn">Показать характеристики</button>
             
             <div id="characteristics" class="characteristics" style="display: none;">
-                <Характеристики будут отображаться здесь>
+                <!-- Характеристики будут отображаться здесь -->
             </div>
         </div>
         
         <div class="section">
             <h2>Сгенерированный сигнал</h2>
-            <button onclick="generateSignal()">Сгенерировать сигнал</button>
+            <button id="generateBtn">Сгенерировать сигнал</button>
             
             <div id="signalDisplay" class="signal-display">
                 Нажмите "Сгенерировать сигнал" для создания тестового сигнала
@@ -180,7 +180,7 @@
         
         <div class="section">
             <h2>Проверка прибора</h2>
-            <button onclick="checkDevice()">Проверить, подходит ли выбранный прибор</button>
+            <button id="checkBtn">Проверить, подходит ли выбранный прибор</button>
             
             <div id="result" class="result">
                 Результат проверки появится здесь
@@ -189,6 +189,7 @@
     </div>
 
     <script>
+        // База данных приборов
         const devices = {
             fsl: {
                 name: "Анализатор спектра R&S FSL",
@@ -235,15 +236,27 @@
         let currentSignal = null;
         let userName = "";
         
+        // Получаем элементы кнопок
+        const welcomeBtn = document.getElementById('welcomeBtn');
+        const showCharBtn = document.getElementById('showCharBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        
+        // Добавляем обработчики событий
+        welcomeBtn.addEventListener('click', welcomeUser);
+        showCharBtn.addEventListener('click', showCharacteristics);
+        generateBtn.addEventListener('click', generateSignal);
+        checkBtn.addEventListener('click', checkDevice);
+        
         function welcomeUser() {
             userName = document.getElementById("userName").value.trim();
             if (userName) {
                 document.getElementById("welcomeMessage").textContent = 
-                    Добро пожаловать, ${userName}! Изучите приборы для измерения ЭМИ.;
+                    `Добро пожаловать, ${userName}! Изучите приборы для измерения ЭМИ.`;
             } else {
                 document.getElementById("welcomeMessage").textContent = 
                     "Пожалуйста, введите ваше имя.";
-}
+            }
         }
         
         function showCharacteristics() {
@@ -259,25 +272,27 @@
             
             const device = devices[deviceId];
             
-            characteristicsDiv.innerHTML = 
+            characteristicsDiv.innerHTML = `
                 <div><strong>Название:</strong></div>
                 <div>${device.name}</div>
                 <div><strong>Частотный диапазон:</strong></div>
                 <div>${device.freqRange}</div>
                 <div><strong>Чувствительность:</strong></div>
                 <div>${device.sensitivity}</div>
-            ;
+            `;
             
             characteristicsDiv.style.display = "grid";
         }
         
         function generateSignal() {
+            // Генерация случайной частоты от 10 Гц до 100 ГГц в логарифмической шкале
             const minLog = Math.log10(0.00001); // 10 Гц
             const maxLog = Math.log10(100000);  // 100 ГГц
             const logRange = maxLog - minLog;
             const randomLog = minLog + Math.random() * logRange;
             const frequency = Math.pow(10, randomLog);
-
+            
+            // Генерация случайного уровня сигнала от -120 до 0 дБм
             const power = Math.round(Math.random() * -120);
             
             // Форматирование частоты для отображения
@@ -298,7 +313,7 @@
             };
             
             document.getElementById("signalDisplay").textContent = 
-                Сигнал: ${freqDisplay}, уровень ${power} дБм;
+                `Сигнал: ${freqDisplay}, уровень ${power} дБм`;
         }
         
         function checkDevice() {
@@ -321,18 +336,20 @@
             const device = devices[deviceId];
             let message = "";
             let isSuitable = true;
-
+            
+            // Проверка частотного диапазона
             if (currentSignal.frequency < device.minFreq) {
-                message += Частота сигнала (${currentSignal.frequency} МГц) ниже минимальной для прибора (${device.minFreq} МГц). ;
+                message += `Частота сигнала (${currentSignal.frequency} МГц) ниже минимальной для прибора (${device.minFreq} МГц). `;
                 isSuitable = false;
             } else if (currentSignal.frequency > device.maxFreq) {
-                message += Частота сигнала (${currentSignal.frequency} МГц) выше максимальной для прибора (${device.maxFreq} МГц). ;
+                message += `Частота сигнала (${currentSignal.frequency} МГц) выше максимальной для прибора (${device.maxFreq} МГц). `;
                 isSuitable = false;
             }
-
+            
+            // Проверка чувствительности
             if (currentSignal.power < device.minPower) {
-                message += Мощность сигнала (${currentSignal.power} дБм) ниже чувствительности прибора (${device.minPower} дБм).;
-isSuitable = false;
+                message += `Мощность сигнала (${currentSignal.power} дБм) ниже чувствительности прибора (${device.minPower} дБм).`;
+                isSuitable = false;
             }
             
             if (isSuitable) {
@@ -343,3 +360,6 @@ isSuitable = false;
                 resultDiv.textContent = "Не подходит — " + message;
             }
         }
+    </script>
+</body>
+</html>
